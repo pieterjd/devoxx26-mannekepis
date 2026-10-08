@@ -13,13 +13,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class ClevercloudApplicationTests {
 
     @Autowired
-    private WaffleSelectionRepository waffleSelectionRepository;
+    private PissedOffSelectionRepository pissedOffSelectionRepository;
 
     @Test
     void contextLoads() {
-        WaffleSelection selection = waffleSelectionRepository.save(new WaffleSelection("Strawberry"));
+        PissedOffSelection selection = pissedOffSelectionRepository.save(new PissedOffSelection("a tad"));
 
         assertNotNull(selection.getId());
-        assertEquals("Strawberry", waffleSelectionRepository.findById(selection.getId()).orElseThrow().getTopping());
+        assertEquals("a tad", pissedOffSelectionRepository.findById(selection.getId()).orElseThrow().getMood());
     }
 }

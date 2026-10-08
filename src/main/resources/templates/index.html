@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Manneke Pis Mood Check</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        belgianRed: '#e30613',
+                        belgianYellow: '#ffd700',
+                        belgianBlack: '#111827'
+                    },
+                    boxShadow: {
+                        belgian: '0 24px 60px rgba(17, 24, 39, 0.35)'
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        body {
+            background-image: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.78)),
+                              url('https://upload.wikimedia.org/wikipedia/commons/9/9d/Mannekin_Pis_%288293232485%29.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .brussels-pattern {
+            background-image:
+                linear-gradient(135deg, rgba(255, 215, 0, 0.12), rgba(227, 6, 19, 0.12)),
+                repeating-linear-gradient(
+                    45deg,
+                    rgba(255,255,255,0.05),
+                    rgba(255,255,255,0.05) 12px,
+                    rgba(0,0,0,0) 12px,
+                    rgba(0,0,0,0) 24px
+                );
+        }
+    </style>
+</head>
+<body class="min-h-screen font-sans text-slate-100 antialiased">
+    <main class="mx-auto flex min-h-screen max-w-6xl items-center justify-center p-6 md:p-12">
+        <section class="brussels-pattern relative w-full overflow-hidden rounded-[2rem] border border-white/10 bg-slate-900/65 shadow-belgian backdrop-blur-sm">
+            <div class="absolute inset-0 bg-gradient-to-r from-belgianYellow/10 via-transparent to-belgianRed/10"></div>
+
+            <div class="relative space-y-8 p-6 md:p-12">
+                <div class="flex items-center justify-between gap-4">
+                    <div class="inline-flex items-center gap-2 rounded-full border border-belgianYellow/40 bg-belgianYellow/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-belgianYellow">
+                        Brussels mood report
+                    </div>
+                    <div class="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-belgianYellow/50 bg-slate-950/60 shadow-lg shadow-belgianYellow/10">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Mannekin_Pis_%288293232485%29.jpg/500px-Mannekin_Pis_%288293232485%29.jpg"
+                             alt="Manneke Pis logo"
+                             class="h-full w-full object-cover" />
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <h1 class="text-4xl font-black tracking-tight text-white md:text-6xl">
+                        How pissed off are you today?
+                    </h1>
+                    <p class="w-full text-base text-slate-200 md:text-lg">
+                        Pick your current energy level and let the city decide if this is a calm stroll or a full-on Brussels showdown.
+                    </p>
+                </div>
+
+                <div class="grid gap-10 md:grid-cols-[1.2fr_1fr] md:items-start">
+                    <form th:action="@{/mood}" method="post" class="space-y-6 rounded-3xl border border-white/10 bg-slate-950/35 p-5 md:p-7">
+                        <div class="space-y-4" role="radiogroup" aria-label="How pissed off are you?">
+                            <label th:each="mood : ${moods}"
+                                   class="group flex cursor-pointer items-center gap-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 transition duration-200 hover:border-belgianYellow/50 hover:bg-white/10"
+                                   th:classappend="${selectedMood == mood} ? 'border-belgianYellow/80 bg-belgianYellow/15 ring-2 ring-belgianYellow/30' : ''">
+                                <input type="radio" name="mood" th:value="${mood}" class="h-5 w-5 accent-belgianRed" th:checked="${selectedMood == mood}" />
+                                <span class="text-lg font-medium text-slate-100" th:text="${mood}">not pissed off</span>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="inline-flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-belgianRed via-red-600 to-belgianYellow px-5 py-3 text-base font-bold uppercase tracking-[0.15em] text-slate-950 shadow-lg shadow-red-950/30 transition hover:scale-[1.01]">
+                            Submit mood
+                        </button>
+                    </form>
+
+                    <div class="flex h-full w-full flex-col rounded-3xl border border-white/10 bg-slate-950/35 p-5 md:p-7">
+                        <div class="mb-6 flex items-center justify-between gap-3">
+                            <h2 class="text-lg font-bold uppercase tracking-[0.18em] text-belgianYellow">Mood histogram</h2>
+                            <span class="rounded-full border border-belgianYellow/40 bg-belgianYellow/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-belgianYellow"
+                                  th:text="${#lists.size(histogram)} + ' options'">3 options</span>
+                        </div>
+
+                        <div class="flex flex-1 flex-col justify-center space-y-5">
+                            <div th:each="entry : ${histogram}" class="space-y-3">
+                                <div class="flex items-center justify-between gap-3 text-sm text-slate-200">
+                                    <span class="font-medium" th:text="${entry.label}">not pissed off</span>
+                                    <span th:text="|${#numbers.formatDecimal(entry.percentage, 1, 0)}% (${entry.count})|">0% (0)</span>
+                                </div>
+                                <div class="h-3 overflow-hidden rounded-full bg-slate-800">
+                                    <div class="h-full rounded-full bg-gradient-to-r from-belgianRed via-red-500 to-belgianYellow transition-all duration-500"
+                                         th:style="|width: ${entry.percentage}%|"
+                                         th:attr="aria-label=${entry.label} + ' ' + ${#numbers.formatDecimal(entry.percentage, 1, 0)} + '%'">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
